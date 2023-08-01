@@ -1,71 +1,44 @@
 #!/usr/bin/python3
-"""Solves the N-queens puzzle.
-Determines all possible solutions to placing N
-N non-attacking queens on an NxN chessboard.
-Example:
-    $ ./0-nqueens.py N
-N must be an integer greater than or equal to 4.
-Attributes:
-    board (list): A list of lists representing the chessboard.
-    solutions (list): A list of lists containing solutions.
-Solutions are represented in the format [[r, c], [r, c], [r, c], [r, c]]
-where `r` and `c` represent the row and column, respectively, where a
-queen must be placed on the chessboard.
-"""
-
+""" N queens """
 import sys
 
-def is_safe(board, row, col, N):
-    # Check if there is a queen in the same column
-    for i in range(row):
-        if board[i][col] == 1:
-            return False
-    
-    # Check upper diagonal on the left side
-    for i, j in zip(range(row, -1, -1), range(col, -1, -1)):
-        if board[i][j] == 1:
-            return False
-    
-    # Check upper diagonal on the right side
-    for i, j in zip(range(row, -1, -1), range(col, N)):
-        if board[i][j] == 1:
-            return False
-    
-    return True
 
-def nqueens_util(board, row, N, solutions):
-    if row == N:
-        # A solution is found, print the board
-        solution = [" ".join(["Q" if cell == 1 else "." for cell in row]) for row in board]
-        solutions.append("\n".join(solution))
-        return
+if len(sys.argv) > 2 or len(sys.argv) < 2:
+    print("Usage: nqueens N")
+    exit(1)
 
-    for col in range(N):
-        if is_safe(board, row, col, N):
-            board[row][col] = 1
-            nqueens_util(board, row + 1, N, solutions)
-            board[row][col] = 0
+if not sys.argv[1].isdigit():
+    print("N must be a number")
+    exit(1)
 
-def nqueens(N):
-    if not N.isdigit():
-        print("N must be a number")
-        sys.exit(1)
+if int(sys.argv[1]) < 4:
+    print("N must be at least 4")
+    exit(1)
 
-    N = int(N)
-    if N < 4:
-        print("N must be at least 4")
-        sys.exit(1)
+n = int(sys.argv[1])
 
-    board = [[0 for _ in range(N)] for _ in range(N)]
-    solutions = []
-    nqueens_util(board, 0, N, solutions)
 
-    for solution in solutions:
-        print(solution)
-    
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: nqueens N")
-        sys.exit(1)
-    
-    nqueens(sys.argv[1])
+def queens(n, i=0, a=[], b=[], c=[]):
+    """ find possible positions """
+    if i < n:
+        for j in range(n):
+            if j not in a and i + j not in b and i - j not in c:
+                yield from queens(n, i + 1, a + [j], b + [i + j], c + [i - j])
+    else:
+        yield a
+
+
+def solve(n):
+    """ solve """
+    k = []
+    i = 0
+    for solution in queens(n, 0):
+        for s in solution:
+            k.append([i, s])
+            i += 1
+        print(k)
+        k = []
+        i = 0
+
+
+solve(n)
